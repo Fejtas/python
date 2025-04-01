@@ -1,0 +1,73 @@
+import random
+
+# Funkce pro vytvoření herního pole
+def vytvor_pole(velikost, pocet_min):
+    # Vytvoření prázdného pole
+    pole = [['.' for _ in range(velikost)] for _ in range(velikost)]
+    
+    # Umístění min
+    miny = 0
+    while miny < pocet_min:
+        x = random.randint(0, velikost - 1)
+        y = random.randint(0, velikost - 1)
+        if pole[x][y] != 'M':  # Pokud na tomto místě není mina
+            pole[x][y] = 'M'
+            miny += 1
+    
+    return pole
+
+# Funkce pro zobrazení herního pole
+def zobraz_pole(pole):
+    for radek in pole:
+        print(" ".join(radek))
+
+# Funkce pro spočítání počtu min kolem dané buňky
+def pocet_min_oko(pole, x, y):
+    velikost = len(pole)
+    pocet = 0
+    for i in range(x-1, x+2):
+        for j in range(y-1, y+2):
+            if 0 <= i < velikost and 0 <= j < velikost and pole[i][j] == 'M':
+                pocet += 1
+    return pocet
+
+# Hlavní funkce hry
+def hra():
+    velikost = 5  # Velikost hracího pole (5x5)
+    pocet_min = 5  # Počet min
+    pole = vytvor_pole(velikost, pocet_min)
+    odhalené = [['.' for _ in range(velikost)] for _ in range(velikost)]  # Pole pro odhalené buňky
+    
+    while True:
+        zobraz_pole(odhalené)
+        
+        # Získání vstupu od hráče
+        try:
+            x, y = map(int, input("Zadejte souřadnice (x y): ").split())
+            if x < 0 or x >= velikost or y < 0 or y >= velikost:
+                print("Neplatné souřadnice. Zkuste to znovu.")
+                continue
+        except ValueError:
+            print("Neplatný formát. Zkuste to znovu.")
+            continue
+        
+        # Pokud hráč narazí na minu
+        if pole[x][y] == 'M':
+            print("Narazili jste na minu! Konec hry.")
+            zobraz_pole(pole)
+            break
+        
+        # Odhalení buňky
+        miny_oko = pocet_min_oko(pole, x, y)
+        odhalené[x][y] = str(miny_oko)
+        
+        # Kontrola vítězství
+        # Pokud odhalíš všechny buňky kromě těch, které obsahují miny
+        odhalené_bunky = sum(row.count('.') for row in odhalené)
+        if odhalené_bunky == pocet_min:
+            print("Gratulujeme! Vyhráli jste!")
+            zobraz_pole(odhalené)
+            break
+
+# Spuštění hry
+hra()
