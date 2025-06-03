@@ -1,0 +1,13 @@
+def not_zero_():
+    try:
+        number = float(input("Enter a number: ")) 
+        if number == 0: 
+            print("Error: the number cannot be zero.") 
+        else:
+            print(f"Thanks, number {number} is valid.") 
+    except ValueError:
+        print("Error: Invalid input, please enter a number.") 
+
+# Main function to run the script 
+not_zero_() 
+
