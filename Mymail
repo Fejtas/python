@@ -1,0 +1,31 @@
+from my_mail import MyMail
+import time
+
+def main():
+    # Use localhost and port 1025 for our mock server
+    mailer = MyMail("127.0.0.1", 1025)
+
+    subject = "Hello from MyMail"
+    body_text = "This is a plain text body."
+    body_html = """
+    <html>
+      <body>
+        <h1>Hello!</h1>
+        <p>This is a <strong>HTML</strong> email test.</p>
+      </body>
+    </html>
+    """
+
+    print("Attempting to send email...")
+    mailer.send(
+        from_addr="sender@example.com",
+        to_addr="recipient@example.com",
+        subject=subject,
+        body_text=body_text,
+        body_html=body_html
+    )
+
+if __name__ == "__main__":
+    # Give the server a moment to start if run consecutively in a real env, 
+    # but here we run server manually first or in background.
+    main()
