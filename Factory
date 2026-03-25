@@ -1,0 +1,52 @@
+from abc import ABC, abstractmethod
+# 1. Návrh rozhraní (Abstraktní třída)
+class Notification(ABC):
+   @abstractmethod
+   def send(self, message: str):
+       """Abstraktní metoda pro odeslání zprávy, kterou musí implementovat potomci."""
+       pass
+# 2. Konkrétní implementace
+class EmailNotification(Notification):
+   def send(self, message: str):
+       print(f"EMAIL: Zpráva '{message}' byla odeslána na email.")
+class SMSNotification(Notification):
+   def send(self, message: str):
+       print(f"SMS: Zpráva '{message}' byla odeslána jako SMS.")
+class PushNotification(Notification):
+   def send(self, message: str):
+       print(f"PUSH: Notifikace '{message}' odeslána do aplikace.")
+# 3. Factory
+class NotificationFactory:
+   # Použití slovníku pro mapování typu na konkrétní třídu nahrazuje dlouhé if/elif
+   _notification_map = {
+       "email": EmailNotification,
+       "sms": SMSNotification,
+       "push": PushNotification
+   }
+   @staticmethod
+   def create_notification(notification_type: str) -> Notification:
+      
+       
+       n_type = notification_type.lower()
+       if n_type in NotificationFactory._notification_map:
+         
+           return NotificationFactory._notification_map[n_type]()
+       else:
+           raise ValueError(f"Chyba: Neznámý typ notifikace '{notification_type}'.")
+# 4. Hlavní program
+def main():
+   # Seznam požadavků
+   requests = [
+       ("email", "Ahoj Petře"),
+       ("sms", "Kód je 1234"),
+       ("push", "Nová zpráva v aplikaci")
+   ]
+   print("--- Odesílání notifikací ---")
+   # Průchod seznamem
+   for n_type, message in requests:
+       try:
+           notification.send(message)
+       except ValueError as e:
+           print(e)
+if __name__ == "__main__":
+   main()
