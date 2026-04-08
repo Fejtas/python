@@ -1,0 +1,39 @@
+from typing import List, Dict, Any, Callable
+
+class ImmutableQuery:
+    def __init__(self, data: List[Dict[str, Any]]):
+        self._data = list(data)
+    
+    def filter_by(self, field: str, value: Any) -> 'ImmutableQuery':
+        # Vrácení nové instance zachovává původní dotaz nedotčený
+        filtered_data = [item for item in self._data if item.get(field) == value]
+        return ImmutableQuery(filtered_data)
+
+    def filter(self, condition: Callable[[Dict[str, Any]], bool]) -> 'ImmutableQuery':
+        """Pokročilé filtrování pomocí vlastní funkce (např. lambda)."""
+        filtered_data = [item for item in self._data if condition(item)]
+        return ImmutableQuery(filtered_data)
+
+    def sort_by(self, field: str, reverse: bool = False) -> 'ImmutableQuery':
+        # Vytvoření kopie dat pro seřazení
+        sorted_data = sorted(
+            self._data, 
+            key=lambda x: (x.get(field) is None, x.get(field)), 
+            reverse=reverse
+        )
+        return ImmutableQuery(sorted_data)
+
+    def limit(self, n: int) -> 'ImmutableQuery':
+        return ImmutableQuery(self._data[:n])
+
+    def execute(self) -> List[Dict[str, Any]]:
+        return self._data
+
+# Ukázka použití vylepšeného API:
+base = ImmutableQuery(data)
+
+# Můžeme vytvořit dvě nezávislé větve z jednoho základu
+adults = base.filter(lambda x: x.get("age", 0) >= 18)
+
+sorted_adults = adults.sort_by("name").execute()
+youngest_adults = adults.sort_by("age").limit(3).execute()
