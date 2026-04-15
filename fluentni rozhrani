@@ -1,0 +1,86 @@
+import copy
+
+class Query:
+
+    def __init__(self, data):
+       
+        self._data = copy.deepcopy(data)
+        self._result = self._data
+
+    def filter(self, field, operator, value):
+     
+        filtered_data = []
+        for item in self._result:
+            if field not in item:
+                continue
+                
+            item_val = item[field]
+            
+            if operator == ">=" and item_val >= value:
+                filtered_data.append(item)
+            elif operator == "<=" and item_val <= value:
+                filtered_data.append(item)
+            elif operator == "!=" and item_val != value:
+                filtered_data.append(item)
+                
+        self._result = filtered_data
+        return self
+
+    def sort_by(self, field, descending=False):
+       
+        self._result.sort(key=lambda x: x.get(field), reverse=descending)
+        return self
+
+    def limit(self, count):
+       
+        self._result = self._result[:count]
+        return self
+
+    def distinct(self, field):
+      
+        seen_values = set()
+        unique_data = []
+        
+        for item in self._result:
+            if field in item:
+                val = item[field]
+                
+                if val not in seen_values:
+                    seen_values.add(val)
+                    unique_data.append(item)
+                    
+        self._result = unique_data
+        return self
+
+    def execute(self):
+        return self._result
+
+
+
+if __name__ == "__main__":
+    
+    data = [
+        {"name": "Anna", "age": 19, "score": 85},
+        {"name": "Petr", "age": 17, "score": 60},
+        {"name": "Eva", "age": 21, "score": 92},
+        {"name": "Jan", "age": 18, "score": 70},
+        {"name": "Lucie", "age": 20, "score": 88},
+        {"name": "Karel", "age": 19, "score": 75}  
+    ]
+
+    print("--- PŮVODNÍ DATA ---")
+    for row in data:
+        print(row)
+
+    print("\n--- VÝSLEDEK FLUENTNÍHO DOTAZU ---")
+    result = (
+        Query(data)
+        .filter("score", ">=", 70)       
+        .sort_by("age", descending=True) 
+        .distinct("age")                 
+        .limit(3)                        
+        .execute()                       
+    )
+
+    for row in result:
+        print(row)
